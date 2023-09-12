@@ -8,6 +8,7 @@ const {
   getAllPosts,
   updatePost,
   getPostById,
+ deletePostById
 } = require('../db');
 
 postsRouter.get('/', async (req, res, next) => {
@@ -38,7 +39,9 @@ postsRouter.get('/', async (req, res, next) => {
 });
 
 postsRouter.post('/', requireUser, async (req, res, next) => {
-  const { title, content = "" } = req.body;
+  const { title, content = "", tags } = req.body;
+
+  // FOR PROBLEM 3
 
   const postData = {};
 
@@ -46,9 +49,11 @@ postsRouter.post('/', requireUser, async (req, res, next) => {
     postData.authorId = req.user.id;
     postData.title = title;
     postData.content = content;
+    postData.tags = tags.trim().split(/\s+/);
 
     const post = await createPost(postData);
 
+   
     if (post) {
       res.send(post);
     } else {
@@ -97,8 +102,11 @@ postsRouter.patch('/:postId', requireUser, async (req, res, next) => {
   }
 });
 
-postsRouter.delete('/:postId', requireUser, async (req, res, next) => {
-  res.send({ message: 'under construction' });
+postsRouter.delete('/:postId', async (req, res, next) => {
+  // FOR PROBLEM 4
+  const rowsDeleted = await deletePostById(req.params.postId)
+  // res.send({ message: 'under construction' });
+  res.json(rowsDeleted)
 });
 
 module.exports = postsRouter;
